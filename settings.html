@@ -269,6 +269,47 @@
             font-size: 13px;
             line-height: 1.6;
         }
+        
+        .permission-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 8px;
+        }
+        
+        .permission-description {
+            margin: 0 0 12px 0;
+            color: #b8c5d6;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .permission-description:last-of-type {
+            margin: 0 0 16px 0;
+        }
+        
+        .permission-description strong {
+            color: #00ffff;
+        }
+        
+        .permission-description strong.magenta {
+            color: #ff00ff;
+        }
+        
+        .permission-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .permission-controls button {
+            display: none;
+        }
+        
+        .permission-status {
+            font-size: 13px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -282,17 +323,17 @@
 
         <div class="setting-group">
             <label>Privacy & Permissions</label>
-            <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 16px; margin-top: 8px;">
-                <p style="margin: 0 0 12px 0; color: #b8c5d6; font-size: 13px; line-height: 1.6;">
-                    <strong style="color: #00ffff;">Full Page Access:</strong> Enables detailed content extraction from all websites for better summaries.
+            <div class="permission-box">
+                <p class="permission-description">
+                    <strong>Full Page Access:</strong> Enables detailed content extraction from all websites for better summaries.
                 </p>
-                <p style="margin: 0 0 16px 0; color: #b8c5d6; font-size: 13px; line-height: 1.6;">
-                    <strong style="color: #ff00ff;">Fallback Mode:</strong> When disabled, only tab titles and URLs are summarized (more private, less detailed).
+                <p class="permission-description">
+                    <strong class="magenta">Fallback Mode:</strong> When disabled, only tab titles and URLs are summarized (more private, less detailed).
                 </p>
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <button id="grantPermissionsBtn" style="display: none;">Grant Full Page Access</button>
-                    <button id="revokePermissionsBtn" class="danger" style="display: none;">Revoke Full Page Access</button>
-                    <span id="permissionStatus" style="font-size: 13px; color: #888;"></span>
+                <div class="permission-controls">
+                    <button id="grantPermissionsBtn">Grant Full Page Access</button>
+                    <button id="revokePermissionsBtn" class="danger">Revoke Full Page Access</button>
+                    <span id="permissionStatus" class="permission-status"></span>
                 </div>
             </div>
         </div>
