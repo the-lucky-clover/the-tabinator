@@ -211,12 +211,50 @@
         margin: 16px 16px 0 16px;
         position: relative;
         z-index: 100;
+        -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
         animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
       
       .login-warning.active {
         display: block;
+      }
+      
+      .fallback-indicator {
+        display: none;
+        background: linear-gradient(135deg, rgba(255,136,0,0.95) 0%, rgba(255,68,0,0.95) 100%);
+        color: #fff;
+        border: 1px solid rgba(255,136,0,0.6);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin: 16px 16px 0 16px;
+        position: relative;
+        z-index: 100;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      
+      .fallback-indicator.active {
+        display: block;
+      }
+      
+      .fallback-indicator strong {
+        color: #fff;
+        text-shadow: 0 0 8px rgba(255,255,255,0.8);
+      }
+      
+      .fallback-indicator a {
+        color: #fff;
+        text-decoration: underline;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      
+      .fallback-indicator a:hover {
+        text-shadow: 0 0 10px rgba(255,255,255,1);
       }
       
       .login-warning-icon {
@@ -281,6 +319,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px);
       }
       
@@ -329,6 +368,7 @@
         font-family: 'Orbitron', monospace;
         font-weight: 700;
         letter-spacing: 1px;
+        -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px);
       }
       
@@ -365,6 +405,7 @@
         animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         pointer-events: none;
         border: 1px solid rgba(0,255,255,0.5);
+        -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
       }
       
@@ -676,6 +717,7 @@
         font-family: 'Orbitron', monospace;
         font-weight: 700;
         letter-spacing: 0.5px;
+        -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px);
       }
       
@@ -1301,6 +1343,11 @@
             Please log in and then try again.
         </div>
         <button class="login-warning-button" id="openChatGPT">◢ OPEN CHATGPT.COM ◣</button>
+    </div>
+    
+    <!-- Fallback Mode Indicator -->
+    <div id="fallbackIndicator" class="fallback-indicator">
+        ⚡ <strong>Fallback Mode Active</strong> - Summaries use tab title & URL only. <a id="grantPermissionsLink">Grant page access</a> for full content extraction.
     </div>
     
     <div id="tab-list">

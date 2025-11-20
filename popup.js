@@ -4,6 +4,56 @@ let completedTabs = 0;
 let modalTimeout = null;
 let tabQueueItems = {}; // Store queue item elements by tab ID
 let loginErrorCount = 0; // Track login errors
+let isFallbackMode = false; // Track if running in fallback mode
+
+function showFallbackIndicator() {
+    const indicator = document.getElementById('fallbackIndicator');
+    indicator.classList.add('active');
+    isFallbackMode = true;
+}
+
+function hideFallbackIndicator() {
+    const indicator = document.getElementById('fallbackIndicator');
+    indicator.classList.remove('active');
+    isFallbackMode = false;
+}
+
+async function checkPermissions() {
+    try {
+        const perm = { origins: ["<all_urls>"] };
+        const hasPermission = await chrome.permissions.contains(perm);
+        if (!hasPermission) {
+            showFallbackIndicator();
+        } else {
+            hideFallbackIndicator();
+        }
+        return hasPermission;
+    } catch (e) {
+        console.warn('[popup] Permission check failed', e);
+        showFallbackIndicator();
+        return false;
+    }
+}
+
+async function requestPermissions() {
+    try {
+        const perm = { origins: ["<all_urls>"] };
+        const granted = await chrome.permissions.request(perm);
+        if (granted) {
+            hideFallbackIndicator();
+            showToast('✓ Full page access granted!', 'success');
+            // Clear cache since we can now extract full content
+            summarizationCache = {};
+        } else {
+            showToast('⚠ Permission not granted', 'error');
+        }
+        return granted;
+    } catch (e) {
+        console.error('[popup] Permission request failed', e);
+        showToast('⚠ Permission request failed', 'error');
+        return false;
+    }
+}
 
 function showLoginWarning() {
     const warning = document.getElementById('loginWarning');
@@ -458,11 +508,12 @@ async function fetchSummary(tab, summaryDiv){
 }
 
 
-function refreshTabs() {
+async function refreshTabs() {
     summarizationCache = {}; // Clear cache
     completedTabs = 0;
     loginErrorCount = 0; // Reset login error count
     hideLoginWarning(); // Hide warning on refresh
+    await checkPermissions(); // Recheck permissions
     
     // Add visual feedback to refresh button
     const refreshBtn = document.getElementById('refreshBtn');
@@ -478,7 +529,10 @@ function refreshTabs() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check permissions on startup
+    await checkPermissions();
+    
     chrome.tabs.query({}, (tabs) => {
         console.log('Total tabs:', tabs.length);
         displayTabs(tabs);
@@ -490,13 +544,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Refresh button
-    document.getElementById('refreshBtn').addEventListener('click', () => {
-        refreshTabs();
+    document.getElementById('refreshBtn').addEventListener('click', async () => {
+        await refreshTabs();
     });
     
     // Open ChatGPT button in login warning
     document.getElementById('openChatGPT').addEventListener('click', () => {
         chrome.tabs.create({ url: 'https://chatgpt.com' });
         showToast('◢ Opening ChatGPT... Please log in and try again ◣', 'info');
+    });
+    
+    // Grant permissions link in fallback indicator
+    document.getElementById('grantPermissionsLink').addEventListener('click', () => {
+        requestPermissions();
     });
 });
