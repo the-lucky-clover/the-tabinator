@@ -452,13 +452,17 @@ async function extractContent(tabId, url) {
 
 async function generateTabInformation() {
      try{
-          const tabs = await chrome.tabs.query({});
+                 // Request optional host permission at runtime for broad origin access
+                 const hasAllUrls = await ensureAllUrlsPermission();
+                 const tabs = await chrome.tabs.query({});
           console.log("[generateTabInformation] Tabs queried:", tabs.map(tab => ({ id: tab.id, url: tab.url, title: tab.title })));
 
         const tabsData = [];
          for (const tab of tabs) {
                 try {
-                  const content = await extractContent(tab.id, tab.url);
+                                    const content = hasAllUrls
+                                                ? await extractContent(tab.id, tab.url)
+                                                : `${tab.title || ''}\n\n${tab.url || ''}`;
                     const summary = await fetchSummary(tab.id, content);
                      tabsData.push({
                           id: tab.id,
@@ -542,6 +546,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         (async () => {
             try {
                 console.log(`[Message] Queuing getSummary for tab ${request.tabId}`);
+                const hasAllUrls = await ensureAllUrlsPermission();
                 
                 const result = await queueSummaryRequest(request.tabId, async () => {
                     // Check if tab still exists
@@ -552,7 +557,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         throw new Error('Tab was closed during processing');
                     }
                     
-                    const content = await extractContent(request.tabId, tab.url);
+                    const content = hasAllUrls
+                        ? await extractContent(request.tabId, tab.url)
+                        : `${tab.title || ''}\n\n${tab.url || ''}`;
                     
                     // Add progress callback
                     const progressCallback = (percent) => {
@@ -586,3 +593,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 chrome.action.onClicked.addListener(() => {
      generateTabInformation();
 });
+
+// Request optional <all_urls> permission at runtime when needed
+async function ensureAllUrlsPermission() {
+    try {
+        const perm = { origins: ["<all_urls>"] };
+        const already = await chrome.permissions.contains(perm);
+        if (already) return true;
+        // Must be called from a user gesture (action click triggers this path)
+        const granted = await chrome.permissions.request(perm);
+        if (!granted) {
+            console.warn('[permissions] <all_urls> not granted; falling back to title+URL only');
+        }
+        return !!granted;
+    } catch (e) {
+        console.warn('[permissions] Request failed; falling back to title+URL only', e);
+        return false;
+    }
+}
