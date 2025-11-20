@@ -6,6 +6,27 @@ let tabQueueItems = {}; // Store queue item elements by tab ID
 let loginErrorCount = 0; // Track login errors
 let isFallbackMode = false; // Track if running in fallback mode
 
+// Create ripple effect on click
+function createRipple(event) {
+    const button = event.currentTarget;
+    const ripple = document.createElement('span');
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+    
+    ripple.style.width = ripple.style.height = `${diameter}px`;
+    ripple.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+    ripple.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+    ripple.classList.add('ripple-effect');
+    
+    const existingRipple = button.querySelector('.ripple-effect');
+    if (existingRipple) {
+        existingRipple.remove();
+    }
+    
+    button.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+}
+
 function showFallbackIndicator() {
     const indicator = document.getElementById('fallbackIndicator');
     indicator.classList.add('active');
@@ -293,6 +314,7 @@ function updateTabCounter(count) {
 async function displayTabs(tabs) {
     const tabListDiv = document.getElementById('tab-list');
     tabListDiv.innerHTML = ''; // Clear previous content
+    tabListDiv.setAttribute('role', 'list');
 
     if (tabs.length === 0) {
         const emptyState = document.createElement('div');
@@ -331,6 +353,9 @@ async function displayTabs(tabs) {
         const tabItem = document.createElement('div');
         tabItem.classList.add('tab-item');
         tabItem.style.setProperty('--item-index', index);
+        tabItem.setAttribute('role', 'listitem');
+        tabItem.setAttribute('tabindex', '0');
+        tabItem.setAttribute('aria-label', `Tab: ${tab.title}`);
         if (tab.active) {
             tabItem.classList.add('active');
         }
@@ -385,30 +410,30 @@ async function displayTabs(tabs) {
     });
 }
 
-function createCopyButton(summary) {
+function createCopyButton(text) {
     const copyBtn = document.createElement('button');
     copyBtn.classList.add('copy-btn');
-    copyBtn.textContent = '📋 COPY';
-    copyBtn.title = 'Copy summary to clipboard';
+    copyBtn.textContent = '◢ COPY ◣';
+    copyBtn.setAttribute('aria-label', 'Copy summary to clipboard');
     
     copyBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
+        createRipple(e);
+        
         try {
-            await navigator.clipboard.writeText(summary);
-            copyBtn.textContent = '✓ COPIED';
+            await navigator.clipboard.writeText(text);
             copyBtn.classList.add('copied');
-            // Satisfying visual reward!
-            createParticleBurst(copyBtn);
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = '';
+            showToast('✓ Summary copied to clipboard!', 'success');
+            
             setTimeout(() => {
-                copyBtn.textContent = '📋 COPY';
                 copyBtn.classList.remove('copied');
+                copyBtn.textContent = originalText;
             }, 2000);
         } catch (err) {
             console.error('Failed to copy:', err);
-            copyBtn.textContent = '✗ ERROR';
-            setTimeout(() => {
-                copyBtn.textContent = '📋 COPY';
-            }, 2000);
+            showToast('⚠ Failed to copy', 'error');
         }
     });
     
@@ -546,18 +571,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         displayTabs(tabs);
     });
     
-    // Settings button
-    document.getElementById('settingsBtn').addEventListener('click', () => {
+    // Settings button with ripple effect
+    const settingsBtn = document.getElementById('settingsBtn');
+    settingsBtn.addEventListener('click', (e) => {
+        createRipple(e);
         chrome.runtime.openOptionsPage();
     });
     
-    // Refresh button
-    document.getElementById('refreshBtn').addEventListener('click', async () => {
-        await refreshTabs();
+    // Refresh button with loading state and ripple
+    const refreshBtn = document.getElementById('refreshBtn');
+    refreshBtn.addEventListener('click', async (e) => {
+        if (refreshBtn.classList.contains('loading')) return;
+        
+        createRipple(e);
+        refreshBtn.classList.add('loading');
+        
+        try {
+            await refreshTabs();
+        } finally {
+            setTimeout(() => {
+                refreshBtn.classList.remove('loading');
+            }, 500);
+        }
     });
     
-    // Open ChatGPT button in login warning
-    document.getElementById('openChatGPT').addEventListener('click', () => {
+    // Open ChatGPT button in login warning with ripple
+    const chatGPTBtn = document.getElementById('openChatGPT');
+    chatGPTBtn.addEventListener('click', (e) => {
+        createRipple(e);
         chrome.tabs.create({ url: 'https://chatgpt.com' });
         showToast('◢ Opening ChatGPT... Please log in and try again ◣', 'info');
     });
