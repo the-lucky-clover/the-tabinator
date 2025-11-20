@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabinator Settings</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 600px;
+            min-height: 500px;
+            margin: 0;
+            padding: 0;
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #2d1b4e 100%);
+            color: #b8c5d6;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, transparent 1px, transparent 2px, rgba(255,255,255,0.03) 3px),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, transparent 1px, transparent 2px, rgba(255,255,255,0.03) 3px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 10;
+            padding: 24px;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 900;
+            margin: 0 0 24px 0;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 
+                0 0 10px rgba(0,255,255,0.8),
+                0 0 20px rgba(0,255,255,0.6),
+                2px 2px 0px rgba(255,0,255,0.5);
+            border-bottom: 2px solid rgba(0,255,255,0.3);
+            padding-bottom: 16px;
+        }
+        
+        .settings-section {
+            background: rgba(15, 20, 40, 0.6);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(0,255,255,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        
+        h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            color: #ff00ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0 0 16px 0;
+            text-shadow: 0 0 5px rgba(255,0,255,0.5);
+        }
+        
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 5px rgba(0,255,255,0.3);
+        }
+        
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(10, 15, 30, 0.8);
+            border: 1px solid rgba(0,255,255,0.3);
+            border-radius: 6px;
+            color: #b8c5d6;
+            font-family: 'Rajdhani', monospace;
+            font-size: 14px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+        
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            accent-color: #00ffff;
+            cursor: pointer;
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0,255,255,0.3);
+            background: rgba(15, 20, 35, 0.9);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Rajdhani', sans-serif;
+            line-height: 1.5;
+        }
+        
+        .api-keys-list {
+            margin-top: 12px;
+        }
+        
+        .api-key-item {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        
+        .api-key-item input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #00ffff 0%, #0088cc 100%);
+            border: 1px solid rgba(0,255,255,0.5);
+            border-radius: 6px;
+            color: #0a0e27;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0,255,255,0.3);
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #00ffff 0%, #00ccff 100%);
+            box-shadow: 0 0 20px rgba(0,255,255,0.6);
+            transform: translateY(-2px);
+        }
+        
+        button.secondary {
+            background: linear-gradient(135deg, #ff00ff 0%, #cc0088 100%);
+            border-color: rgba(255,0,255,0.5);
+            box-shadow: 0 0 10px rgba(255,0,255,0.3);
+        }
+        
+        button.secondary:hover {
+            background: linear-gradient(135deg, #ff00ff 0%, #ff00cc 100%);
+            box-shadow: 0 0 20px rgba(255,0,255,0.6);
+        }
+        
+        button.danger {
+            background: linear-gradient(135deg, #ff3366 0%, #cc0033 100%);
+            border-color: rgba(255,51,102,0.5);
+            box-shadow: 0 0 10px rgba(255,51,102,0.3);
+            padding: 6px 12px;
+            font-size: 10px;
+        }
+        
+        button.danger:hover {
+            background: linear-gradient(135deg, #ff3366 0%, #ff0044 100%);
+            box-shadow: 0 0 20px rgba(255,51,102,0.6);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .hint {
+            font-size: 11px;
+            color: #6b7b8c;
+            font-style: italic;
+            margin-top: -8px;
+            margin-bottom: 12px;
+        }
+        
+        .status-message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 16px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: rgba(0,255,0,0.1);
+            border: 1px solid rgba(0,255,0,0.3);
+            color: #00ff88;
+        }
+        
+        .status-message.error {
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.3);
+            color: #ff3366;
+        }
+        
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .preset-btn {
+            padding: 6px 12px;
+            font-size: 10px;
+            background: rgba(0,255,255,0.1);
+            border: 1px solid rgba(0,255,255,0.3);
+        }
+        
+        .preset-btn:hover {
+            background: rgba(0,255,255,0.2);
+            transform: none;
+        }
+        
+        .info-box {
+            background: rgba(0,255,255,0.1);
+            border: 2px solid rgba(0,255,255,0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 0 15px rgba(0,255,255,0.2);
+        }
+        
+        .info-box h3 {
+            margin: 0 0 8px 0;
+            color: #00ffff;
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .info-box p {
+            margin: 0;
+            color: #b8c5d6;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>◢ Settings ◣</h1>
+        
+                <div class="info-box">
+            <h3>🌐 Free ChatGPT Web Access</h3>
+            <p>This extension uses ChatGPT's free web interface (chatgpt.com) for summarization. Make sure you're logged into chatgpt.com before using the extension. No API keys needed!</p>
+        </div>
+
+        <div class="setting-group">
+            <label>Privacy & Permissions</label>
+            <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 16px; margin-top: 8px;">
+                <p style="margin: 0 0 12px 0; color: #b8c5d6; font-size: 13px; line-height: 1.6;">
+                    <strong style="color: #00ffff;">Full Page Access:</strong> Enables detailed content extraction from all websites for better summaries.
+                </p>
+                <p style="margin: 0 0 16px 0; color: #b8c5d6; font-size: 13px; line-height: 1.6;">
+                    <strong style="color: #ff00ff;">Fallback Mode:</strong> When disabled, only tab titles and URLs are summarized (more private, less detailed).
+                </p>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <button id="grantPermissionsBtn" style="display: none;">Grant Full Page Access</button>
+                    <button id="revokePermissionsBtn" class="danger" style="display: none;">Revoke Full Page Access</button>
+                    <span id="permissionStatus" style="font-size: 13px; color: #888;"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <label for="customPrompt">Custom Summarization Prompt</label>
+            <div class="preset-buttons">
+                <button type="button" class="preset-btn" data-preset="concise">Concise</button>
+                <button type="button" class="preset-btn" data-preset="detailed">Detailed</button>
+                <button type="button" class="preset-btn" data-preset="bullet">Bullet Points</button>
+                <button type="button" class="preset-btn" data-preset="technical">Technical</button>
+                <button type="button" class="preset-btn" data-preset="eli5">ELI5</button>
+            </div>
+            <textarea 
+                id="customPrompt" 
+                rows="4" 
+                placeholder="Leave empty for default summarization, or enter custom instructions like 'Summarize in 3 bullet points' or 'Focus on technical details'..."
+            ></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button id="saveBtn">Save Settings</button>
+            <button id="resetBtn" class="danger">Reset to Defaults</button>
+        </div>
+        
+        <div id="statusMessage" class="status-message"></div>
+    </div>
+    
+    <script src="settings.js"></script>
+</body>
+</html>
