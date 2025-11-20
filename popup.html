@@ -1120,6 +1120,16 @@
         letter-spacing: 1px;
         margin-bottom: 8px;
         text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      
+      .progress-count {
+        color: rgba(255,255,255,0.6);
+        font-size: 11px;
+        font-weight: 400;
       }
       
       .tab-queue-container {
@@ -1361,7 +1371,10 @@
             
             <!-- Overall Progress -->
             <div class="overall-progress-section">
-                <div class="progress-label">Total Progress</div>
+                <div class="progress-label">
+                    <span>Total Progress</span>
+                    <span id="progressCount" class="progress-count">0/0</span>
+                </div>
                 <div class="progress-bar-container">
                     <div id="progressBar" class="progress-bar"></div>
                 </div>

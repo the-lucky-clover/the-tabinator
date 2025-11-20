@@ -111,6 +111,12 @@ function updateProgress(completed, total, message = '') {
     const progressBar = document.getElementById('progressBar');
     const progressPercentage = document.getElementById('progressPercentage');
     const progressText = document.getElementById('progressText');
+    const progressCount = document.getElementById('progressCount');
+    
+    // Update count display
+    if (progressCount) {
+        progressCount.textContent = `${completed}/${total}`;
+    }
     
     // Animate percentage counting
     const animatePercentage = () => {
@@ -420,7 +426,7 @@ async function fetchSummary(tab, summaryDiv){
         
         updateQueueItemStatus(tab.id, 'completed');
         completedTabs++;
-        updateProgress(completedTabs, totalTabs, `Analyzing tab ${completedTabs}/${totalTabs}...`);
+        updateProgress(completedTabs, totalTabs, `◢ Loaded from cache ◣`);
         if (completedTabs === totalTabs) {
             setTimeout(hideProgressModal, 500);
         }
@@ -432,13 +438,15 @@ async function fetchSummary(tab, summaryDiv){
         
     try {
         let hostname = 'tab';
+        let displayName = tab.title || 'tab';
         try {
             hostname = new URL(tab.url).hostname;
+            displayName = hostname.replace('www.', ''); // Clean up hostname
         } catch (e) {
-            hostname = tab.title || 'tab';
+            displayName = tab.title || 'tab';
         }
         
-        updateProgress(completedTabs, totalTabs, `◢ Analyzing: ${hostname}... ◣`);
+        updateProgress(completedTabs, totalTabs, `◢ Processing: ${displayName} ◣`);
         
         const response = await chrome.runtime.sendMessage({action:'getSummary', tabId:tab.id});
         summaryDiv.innerHTML = '';
